@@ -10,6 +10,9 @@ fi
 
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
+REGION=eu-west-1
+PROFILE=default
+
 case $1 in
   create | update)
     ACTION=$1
@@ -21,10 +24,12 @@ case $1 in
 esac
 
 aws cloudformation $ACTION-stack \
-  --region us-east-1 \
+  --region $REGION \
+  --profile $PROFILE \
   --stack-name ecs-bootstrap-demo-app-infrastructure \
   --template-body file://$DIR/../cfn-templates/ecs-bootstrap-demo-app-infrastructure.yaml
 
 aws cloudformation wait stack-$ACTION-complete \
-  --region us-east-1 \
+  --region $REGION \
+  --profile $PROFILE \
   --stack-name ecs-bootstrap-demo-app-infrastructure

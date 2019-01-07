@@ -10,6 +10,9 @@ fi
 
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
+REGION=eu-west-1
+PROFILE=default
+
 case $1 in
   create | update)
     ACTION=$1
@@ -22,7 +25,8 @@ esac
 
 VPC_ID=$(
   aws ec2 describe-vpcs \
-    --region us-east-1 \
+    --region $REGION \
+    --profile $PROFILE \
     --filters \
       Name=isDefault,Values=true \
     --output text \
@@ -31,7 +35,8 @@ VPC_ID=$(
 )
 SUBNETS=$(
   aws ec2 describe-subnets \
-    --region us-east-1 \
+    --region $REGION \
+    --profile $PROFILE \
     --filter \
       Name=vpcId,Values=$VPC_ID \
       Name=defaultForAz,Values=true \
@@ -41,13 +46,14 @@ SUBNETS=$(
 )
 
 aws cloudformation $ACTION-stack \
-  --region us-east-1 \
+  --region $REGION \
   --stack-name ecs-bootstrap-demo-app \
   --template-body file://$DIR/../cfn-templates/ecs-bootstrap-demo-app.yaml \
   --capabilities CAPABILITY_IAM \
   --parameters \
-    ParameterKey=Subnets,ParameterValue=\"$SUBNETS\"
+    ParameterKey=Subnets,ParameterValue=\"$SUBNETS\" \
+    ParameterKey=VPC,ParameterValue=\"$VPC_ID\"
 
 aws cloudformation wait stack-$ACTION-complete \
-  --region us-east-1 \
+  --region $REGION \
   --stack-name ecs-bootstrap-demo-app

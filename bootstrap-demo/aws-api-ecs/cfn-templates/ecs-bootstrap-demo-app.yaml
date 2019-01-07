@@ -2,6 +2,8 @@ AWSTemplateFormatVersion: '2010-09-09'
 Parameters:
   Subnets:
     Type: List<AWS::EC2::Subnet::Id>
+  VPC:
+    Type: AWS::EC2::VPC::Id
 Resources:
   Cluster:
     Type: AWS::ECS::Cluster
@@ -87,6 +89,7 @@ Resources:
           FromPort: 8558
           ToPort: 8558
           CidrIpv6: "::/0"
+      VpcId: !Ref VPC
   ServiceSecurityGroupAkkaManagementSelfIngress:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
